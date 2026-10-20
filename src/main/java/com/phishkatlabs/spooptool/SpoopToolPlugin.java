@@ -1,5 +1,6 @@
 package com.phishkatlabs.spooptool;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Provides;
 import java.util.ArrayList;
@@ -73,8 +74,8 @@ public class SpoopToolPlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
-	/** The server takes at most this many events in one call. */
-	private static final int MAX_EVENTS_PER_CALL = 20;
+	/** The server takes at most this many items in one drop. */
+	private static final int MAX_DROP_ITEMS = 30;
 	/**
 	 * How long to wait for a pet's name. The game's pet message doesn't say
 	 * which pet; the collection log line (a new pet) or the untradeable-drop
@@ -303,11 +304,13 @@ public class SpoopToolPlugin extends Plugin
 	}
 
 	/**
-	 * Share each item in a drop worth at least the player's threshold, at Grand
-	 * Exchange prices. Stacks of one item are added up, noted and unnoted alike.
-	 * Runs on the client thread, where item names can be looked up.
+	 * Share one kill's drop, all of it, when it's worth at least the player's
+	 * threshold at Grand Exchange prices: one feed line per kill, not one per
+	 * item, so the bones every kill drops don't become lines of their own.
+	 * Stacks of one item are added up, noted and unnoted alike. Runs on the
+	 * client thread, where item names can be looked up.
 	 */
-	private void shareLoot(String source, Collection<ItemStack> items)
+	private void shareLoot(String source, Collection<ItemStack> stacks)
 	{
 		int minimum = config.minDropValue();
 		if (token == null || minimum <= 0)
@@ -315,32 +318,38 @@ public class SpoopToolPlugin extends Plugin
 			return;
 		}
 		Map<Integer, Integer> quantities = new LinkedHashMap<>();
-		for (ItemStack stack : items)
+		for (ItemStack stack : stacks)
 		{
 			quantities.merge(itemManager.canonicalize(stack.getId()), stack.getQuantity(), Integer::sum);
 		}
 
-		List<JsonObject> drops = new ArrayList<>();
+		List<JsonObject> items = new ArrayList<>();
+		long total = 0;
 		for (Map.Entry<Integer, Integer> entry : quantities.entrySet())
 		{
 			long value = (long) itemManager.getItemPrice(entry.getKey()) * entry.getValue();
-			if (value < minimum)
-			{
-				continue;
-			}
-			JsonObject d = data("item", itemManager.getItemComposition(entry.getKey()).getName());
-			d.addProperty("quantity", entry.getValue());
-			d.addProperty("value", (int) Math.min(value, Integer.MAX_VALUE));
-			if (source != null)
-			{
-				d.addProperty("source", source);
-			}
-			drops.add(feedEvent("drop", d));
+			total += value;
+			JsonObject item = data("item", itemManager.getItemComposition(entry.getKey()).getName());
+			item.addProperty("quantity", entry.getValue());
+			item.addProperty("value", (int) Math.min(value, Integer.MAX_VALUE));
+			items.add(item);
 		}
-		if (!drops.isEmpty())
+		if (items.isEmpty() || total < minimum)
 		{
-			api.sendEvents(token, drops.subList(0, Math.min(drops.size(), MAX_EVENTS_PER_CALL)));
+			return;
 		}
+		// Most valuable first, and no more than the server takes in one drop.
+		items.sort((a, b) -> Integer.compare(b.get("value").getAsInt(), a.get("value").getAsInt()));
+		JsonArray list = new JsonArray();
+		items.subList(0, Math.min(items.size(), MAX_DROP_ITEMS)).forEach(list::add);
+
+		JsonObject drop = new JsonObject();
+		drop.add("items", list);
+		if (source != null)
+		{
+			drop.addProperty("source", source);
+		}
+		send(feedEvent("drop", drop));
 	}
 
 	private void sharePet(String name)

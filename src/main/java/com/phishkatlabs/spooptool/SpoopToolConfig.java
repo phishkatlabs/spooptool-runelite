@@ -33,7 +33,7 @@ public interface SpoopToolConfig extends Config
 	@ConfigItem(
 		keyName = "minDropValue",
 		name = "Drops worth at least",
-		description = "Share a drop when it's worth at least this many coins at Grand Exchange prices. 0 shares no drops.",
+		description = "Share a kill's drop, everything in it, when it's worth at least this many coins at Grand Exchange prices. 0 shares no drops.",
 		section = FEED,
 		position = 2
 	)

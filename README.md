@@ -15,7 +15,7 @@ Nothing at all until you type a link code from the app. After that:
 |---|---|
 | You enter a link code | The code, your in-game name and RuneLite's account hash |
 | You log out | Your in-game name and account hash |
-| A drop is worth at least your threshold (default 100k) | The item, quantity, value and what dropped it |
+| A kill's drop is worth at least your threshold (default 100k) | Everything it dropped (items, quantities, values) and what dropped it |
 | You get a pet | That it happened, and its name if the game says |
 | A new collection log item (game notification on) | The item |
 | You finish a diary tier or a combat task | Which one |
