@@ -25,7 +25,7 @@ public interface SpoopToolConfig extends Config
 
 	@ConfigSection(
 		name = "Feed",
-		description = "What this plugin shares to your feed in the SpoopTool app, once linked. Nothing is ranked from it.",
+		description = "What this plugin shares with the SpoopTool app once linked. It shows in your clans' feeds, and drops count toward their weekly loot rankings.",
 		position = 1
 	)
 	String FEED = "feed";

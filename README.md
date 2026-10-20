@@ -23,7 +23,8 @@ Nothing at all until you type a link code from the app. After that:
 
 Each of these can be switched off in the plugin's **Feed** settings.
 
-Feed events only appear in your feed; SpoopTool never ranks anything this plugin sends. The account hash is how
+Feed events appear in the feeds of the clans you're in. Drops also count toward those clans' loot rankings: the
+weekly loot medal and the Loot card on Home. Nothing else this plugin sends is ranked. The account hash is how
 SpoopTool keeps your history together through a name change. Like any website, the server also sees your IP address.
 
 SpoopTool's server is not controlled or verified by the RuneLite developers. It reads nothing about other players:
