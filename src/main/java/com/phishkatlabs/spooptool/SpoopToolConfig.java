@@ -12,7 +12,7 @@ public interface SpoopToolConfig extends Config
 
 	@ConfigItem(
 		keyName = LINK_CODE_KEY,
-		name = "Link code",
+		name = "Link code (from the SpoopTool app)",
 		description = "The code from the SpoopTool app (Settings, then Link the RuneLite plugin)."
 			+ " Log in to the account you want to link first. The code is used straight away and then cleared.",
 		position = 0

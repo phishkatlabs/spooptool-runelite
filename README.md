@@ -22,7 +22,7 @@ players, no chat, no inventory, no location.
 
 1. In the SpoopTool app, open **Settings**, then **Link the RuneLite plugin**. It shows a code like `KX7-PQM`.
 2. Log in to the account you want to link.
-3. Open this plugin's settings and type the code into **Link code**.
+3. Open this plugin's settings and type the code into **Link code (from the SpoopTool app)**, then press Enter.
 
 The chatbox confirms the link. Each account you play links separately, because the link is stored in that account's
 RuneLite profile.
