@@ -1,7 +1,11 @@
 # SpoopTool RuneLite plugin
 
-Links your Old School RuneScape account to **SpoopTool**, the clan tracker app by PhishKat Labs, and tells
-SpoopTool when you log out so your stats update straight away instead of within a few hours.
+Links your Old School RuneScape account to **SpoopTool**, the clan tracker app by PhishKat Labs. It does three
+things:
+- it tells SpoopTool when you log out, so your stats update straight away instead of within a few hours;
+- it shares what only the game client sees to your feed in the app: drops, pets, collection log items, diaries and
+  combat tasks;
+- it shares deaths, but only if you turn that on.
 
 ## What it sends, and when
 
@@ -11,12 +15,19 @@ Nothing at all until you type a link code from the app. After that:
 |---|---|
 | You enter a link code | The code, your in-game name and RuneLite's account hash |
 | You log out | Your in-game name and account hash |
+| A drop is worth at least your threshold (default 100k) | The item, quantity, value and what dropped it |
+| You get a pet | That it happened, and its name if the game says |
+| A new collection log item (game notification on) | The item |
+| You finish a diary tier or a combat task | Which one |
+| You die (off by default) | That you died |
 
-The account hash is how SpoopTool keeps your history together through a name change. Like any website, the server
-also sees your IP address.
+Each of these can be switched off in the plugin's **Feed** settings.
 
-SpoopTool's server is not controlled or verified by the RuneLite developers. Nothing else is read or sent: no other
-players, no chat, no inventory, no location.
+Feed events only appear in your feed; SpoopTool never ranks anything this plugin sends. The account hash is how
+SpoopTool keeps your history together through a name change. Like any website, the server also sees your IP address.
+
+SpoopTool's server is not controlled or verified by the RuneLite developers. It reads nothing about other players:
+no names, chat, gear or locations.
 
 ## Linking
 

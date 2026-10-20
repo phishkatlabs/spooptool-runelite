@@ -1,9 +1,11 @@
 package com.phishkatlabs.spooptool;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,7 +28,9 @@ import okhttp3.ResponseBody;
  * Every call is asynchronous, so the game never waits on the network.
  *
  * What's sent, and only after the player has typed a link code from the app:
- * their in-game name and RuneLite's account hash.
+ * their in-game name and RuneLite's account hash, and the feed events their
+ * settings allow (drops over a value, pets, collection log items, diaries,
+ * combat tasks, and deaths if they turn that on).
  */
 @Slf4j
 @Singleton
@@ -150,6 +154,55 @@ class SpoopToolApi
 				catch (IOException e)
 				{
 					log.debug("SpoopTool logout response unreadable", e);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Send feed events, each `{kind, data}`. Fire and forget, like the logout
+	 * ping: a lost event is a missing feed line, not something to bother the
+	 * player about.
+	 */
+	void sendEvents(String token, List<JsonObject> events)
+	{
+		if (events.isEmpty())
+		{
+			return;
+		}
+		JsonArray list = new JsonArray();
+		events.forEach(list::add);
+		JsonObject body = new JsonObject();
+		body.add("events", list);
+
+		Request request = new Request.Builder()
+			.url(BASE.resolve("plugin/events"))
+			.header("Authorization", "Bearer " + token)
+			.post(RequestBody.create(JSON, gson.toJson(body)))
+			.build();
+
+		http.newCall(request).enqueue(new Callback()
+		{
+			@Override
+			public void onFailure(Call call, IOException e)
+			{
+				log.debug("SpoopTool events failed", e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response)
+			{
+				try (ResponseBody responseBody = response.body())
+				{
+					if (!response.isSuccessful())
+					{
+						String text = responseBody == null ? "" : responseBody.string();
+						log.debug("SpoopTool events refused: {}", errorMessage(text, response.code()));
+					}
+				}
+				catch (IOException e)
+				{
+					log.debug("SpoopTool events response unreadable", e);
 				}
 			}
 		});
